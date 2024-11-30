@@ -1,44 +1,50 @@
-import os
-import pandas as pd
 import torch
-from PIL import Image
-from torchvision import transforms
-from torch.utils.data import Dataset, DataLoader
-from torchvision.transforms import Normalize
-from torchvision.transforms.v2 import ToDtype
+from torch import nn
+from tools import get_dataloader, show_metrics, train_and_evaluate
+
+train_dl, test_dl = get_dataloader()
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(device)
+
+class LinerModel(torch.nn.Module):
+    def __init__(self):
+        super(LinerModel, self).__init__()
+        self.model = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(128 * 128 * 3, 128),
+            nn.ReLU(),
+            nn.BatchNorm1d(128),
+            nn.Dropout(0.1),
+
+            nn.Linear(128, 256),
+            nn.ReLU(),
+            nn.BatchNorm1d(256),
+            nn.Dropout(0.1),
+
+            nn.Linear(256, 256),
+            nn.ReLU(),
+            nn.BatchNorm1d(256),
+            nn.Dropout(0.1),
+
+            nn.Linear(256, 128),
+            nn.ReLU(),
+            nn.BatchNorm1d(128),
+            nn.Dropout(0.1),
+
+            nn.Linear(128, 20),
+            nn.Sigmoid(),
+        )
+
+    def forward(self, x):
+        y = self.model(x)
+        return y
+
+    def process(self, x):
+        return self(x)
 
 
-class CustomDataset(Dataset):
-    def __init__(self, csv_file, root_dir, transform=None):
-        self.data_frame = pd.read_csv(csv_file)
-        self.root_dir = root_dir
-        self.transform = transform
+l_model = LinerModel()
 
-    def __len__(self):
-        return len(self.data_frame)
+show_metrics(*train_and_evaluate(l_model, train_dl, test_dl, 50))
 
-    def __getitem__(self, idx):
-        img_name = os.path.join(self.root_dir, str(self.data_frame.iloc[idx, 0]) + ".jpg")  # Предполагаем, что путь к изображению в первом столбце
-        image = Image.open(img_name).convert('RGB')  # Открываем изображение и конвертируем в RGB
-        label = self.data_frame.iloc[idx, 1]  # Предполагаем, что метка во втором столбце
-
-        if self.transform:
-            image = self.transform(image)
-
-        return image, label
-
-
-csv_file = 'C:/Users/kosty/gadflhahjadgjtma/ML-Project/human_poses_data/train_answers.csv'
-root_dir = 'C:/Users/kosty/gadflhahjadgjtma/ML-Project/human_poses_data/img_train'
-
-
-transforms = transforms.Compose([
-    transforms.Resize((512, 512)),
-    transforms.ToTensor(),
-    ToDtype(torch.float32, scale=True),
-    Normalize((0.5, 0.5, 0.5), (0.25, 0.25, 0.25))
-])
-
-
-dataset = CustomDataset(csv_file=csv_file, root_dir=root_dir, transform=transforms)
-dataloader = DataLoader(dataset, batch_size=128, shuffle=True)
+torch.save(l_model, "C:\\Users\\kosty\\gadflhahjadgjtma\\ML-Project\\model2.pth")
