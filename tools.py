@@ -14,6 +14,7 @@ from torchvision.transforms.v2 import ToDtype
 from IPython.display import clear_output
 import matplotlib.pyplot as plt
 from tqdm.asyncio import tqdm
+import csv
 
 
 class CustomDataset(Dataset):
@@ -34,6 +35,26 @@ class CustomDataset(Dataset):
             image = self.transform(image)
 
         return image, label
+
+
+class CustomTestDataset(Dataset):
+    def __init__(self, root_dir, transform=None):
+        self.data_frame = os.listdir(root_dir)
+        self.root_dir = root_dir
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.data_frame)
+
+    def __getitem__(self, idx):
+        img_name = os.path.join(self.root_dir, str(self.data_frame[idx]))
+        image = Image.open(img_name).convert('RGB')
+
+
+        if self.transform:
+            image = self.transform(image)
+
+        return image
 
 
 def get_dataloader(ratio: tuple[float, float] = (0.9, 0.1),
@@ -136,3 +157,28 @@ def show_metrics(train_loss_hist, test_loss_hist, test_metrics):
 
     plt.tight_layout()
     plt.show()
+
+
+def get_result(model: torch.nn.Module):
+    dataset = CustomTestDataset("C:/Users/kosty/gadflhahjadgjtma/ML-Project/human_poses_data/img_test",
+                                    transform=transforms.Compose([
+                                        transforms.Resize((128, 128)),
+                                        transforms.ToTensor(),
+                                        ToDtype(torch.float32, scale=True),
+                                        Normalize((0.5, 0.5, 0.5), (0.25, 0.25, 0.25))]))
+    dl = DataLoader(dataset, batch_size=128)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.eval()
+    ans = []
+    for i, img in enumerate(tqdm(dl)):
+        img = img.to(device)
+        pred = model.to(device)(img)
+        preds = torch.argmax(pred, dim=1)
+        res = torch.cat((torch.arange(i * 128, i * 128 + len(img)).unsqueeze(1), preds.unsqueeze(1)), dim=1)
+        ans.extend(res)
+    ans = [[element.item() for element in row] for row in ans]
+    with open('result.csv', 'w', newline="") as out_file:
+        writer = csv.writer(out_file, delimiter=',')
+        writer.writerow(['id', 'target_feature'])
+        writer.writerows(ans)
+
