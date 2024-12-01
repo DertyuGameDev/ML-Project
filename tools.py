@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import torch
 from PIL import Image
+from pygame.draw_py import draw_aaline
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from torch import optim, nn
 from torchvision import transforms
@@ -24,12 +25,19 @@ class CustomDataset(Dataset):
         self.transform = transform
 
     def __len__(self):
-        return len(self.data_frame)
+        return len(self.data_frame) * 2
 
     def __getitem__(self, idx):
-        img_name = os.path.join(self.root_dir, str(self.data_frame.iloc[idx, 0]) + ".jpg")  # ID изображений в первом столбце
-        image = Image.open(img_name).convert('RGB')
-        label = self.data_frame.iloc[idx, 1]  # Метки во втором столбце
+        if idx % 2 == 0:
+            img_name = os.path.join(self.root_dir, str(self.data_frame.iloc[idx // 2, 0]) + ".jpg")  # ID изображений в первом столбце
+            image = Image.open(img_name).convert('RGB')
+            label = self.data_frame.iloc[idx // 2, 1]  # Метки во втором столбце
+        else:
+            img_name = os.path.join(self.root_dir,
+                                    str(self.data_frame.iloc[idx // 2, 0]) + ".jpg")  # ID изображений в первом столбце
+            image = Image.open(img_name).convert('RGB')
+            image.transpose(Image.FLIP_LEFT_RIGHT)
+            label = self.data_frame.iloc[idx // 2, 1]  # Метки во втором столбце
 
         if self.transform:
             image = self.transform(image)
@@ -49,12 +57,13 @@ class CustomTestDataset(Dataset):
     def __getitem__(self, idx):
         img_name = os.path.join(self.root_dir, str(self.data_frame[idx]))
         image = Image.open(img_name).convert('RGB')
+        label = self.data_frame[idx].replace(".jpg", '')
 
 
         if self.transform:
             image = self.transform(image)
 
-        return image
+        return image, int(label)
 
 
 def get_dataloader(ratio: tuple[float, float] = (0.9, 0.1),
@@ -170,11 +179,11 @@ def get_result(model: torch.nn.Module):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.eval()
     ans = []
-    for i, img in enumerate(tqdm(dl)):
+    for img, label in tqdm(dl):
         img = img.to(device)
         pred = model.to(device)(img)
         preds = torch.argmax(pred, dim=1)
-        res = torch.cat((torch.arange(i * 128, i * 128 + len(img)).unsqueeze(1), preds.unsqueeze(1)), dim=1)
+        res = torch.cat((torch.tensor(label).unsqueeze(1), preds.unsqueeze(1)), dim=1)
         ans.extend(res)
     ans = [[element.item() for element in row] for row in ans]
     with open('result.csv', 'w', newline="") as out_file:
