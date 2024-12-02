@@ -1,5 +1,7 @@
 import torch
 from torch import nn
+from torchvision.transforms import transforms, Normalize
+from torchvision.transforms.v2 import ToDtype
 
 
 class Model(torch.nn.Module):
@@ -37,3 +39,11 @@ class Model(torch.nn.Module):
 
     def process(self, x):
         return self(x)
+
+
+transform = transforms.Compose([
+    transforms.Resize((128, 128)),
+    transforms.ToTensor(),
+    ToDtype(torch.float32, scale=True),
+    Normalize((0.5, 0.5, 0.5), (0.25, 0.25, 0.25))
+])
