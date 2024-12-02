@@ -1,0 +1,1 @@
+Epoch 50/50, Train Loss: 2.3850, Val Loss: 2.4253, Val Acc: 30.7723, Val Prec: 0.3596, Val Recall: 0.3077, Val F1: 0.2122
