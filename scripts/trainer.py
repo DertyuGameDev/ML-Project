@@ -40,7 +40,7 @@ def run_epoch(loss_func, model, optimizer, train_loader):
     model.train()
     train_loss = 0
     for images, labels in tqdm(train_loader):
-        images, labels = images.to(constants.device), labels.to(constants.device)
+        images, labels = images.to(constants.device), labels.to(constants.device).type(torch.float32)
 
         optimizer.zero_grad()
         outputs = model(images)
@@ -60,13 +60,13 @@ def ran_val_epoch(loss_func, model, val_loader):
     all_labels = []
     with torch.no_grad():
         for images, labels in tqdm(val_loader):
-            images, labels = images.to(constants.device), labels.to(constants.device)
+            images, labels = images.to(constants.device), labels.to(constants.device).type(torch.float32)
             images, labels = images, labels
             outputs = model(images)
             loss = loss_func(outputs, labels)
             val_loss += loss.item()
 
-            preds = torch.argmax(outputs, dim=1)
+            preds = outputs
             all_preds.extend(preds.cpu().numpy())
             all_labels.extend(labels.cpu().numpy())
     val_loss /= len(val_loader)
