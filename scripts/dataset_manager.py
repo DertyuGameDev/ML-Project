@@ -32,9 +32,9 @@ class CustomDataset(Dataset):
         #     image.transpose(Image.FLIP_LEFT_RIGHT)
         #     label = self.data_frame.iloc[idx // 2, 1]  # Метки во втором столбце
         img_name = os.path.join(self.root_dir,
-                                str(self.data_frame.iloc[idx // 2, 0]) + ".jpg")  # ID изображений в первом столбце
+                                str(self.data_frame.iloc[idx, 0]) + ".jpg")  # ID изображений в первом столбце
         image = Image.open(img_name).convert('RGB')
-        label = self.data_frame.iloc[idx // 2, 1]  # Метки во втором столбце
+        label = self.data_frame.iloc[idx, 1]  # Метки во втором столбце
 
         if self.transform:
             image = self.transform(image)

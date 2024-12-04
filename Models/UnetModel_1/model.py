@@ -41,46 +41,47 @@ class Model(nn.Module):
         super(Model, self).__init__()
 
         # Энкодер
-        # self.e1 = Conv(3, 64)
-        # self.e2 = Conv(3, 128)
-        self.e3 = Conv(3, 32)
-        self.e4 = Conv(32, 64)
-        self.trans = Conv(64, 128)
+        self.e1 = Conv(3, 64)
+        self.e2 = Conv(64, 128)
+        # self.e3 = Conv(128, 256)
+        # self.e4 = Conv(16, 32)
+        self.trans = Conv(128, 256)
         self.max_pool = MaxPool2d((2, 2), stride=2)
 
 
         # Декодер
-        self.d1 = DConv(128, 64)
-        self.d2 = DConv(64, 32)
-        # self.d3 = DConv(256, 128)
-        # self.d4 = DConv(128, 64)
+        # self.d1 = DConv(1024, 512)
+        # self.d2 = DConv(512, 256)
+        self.d3 = DConv(256, 128)
+        self.d4 = DConv(128, 64)
 
         # Классификатор
         self.classifier = nn.Sequential(
-            nn.Flatten(),
-            nn.Linear(64 * 64 * 8, 32),
-            nn.ReLU(),
-            nn.Linear(32, 20),
+            nn.Conv2d(64, 20, kernel_size=1),
+            nn.AdaptiveAvgPool2d(1)
         )
 
     def forward(self, x):
         # ЭНКОДЕР
-        # x_e1 = self.e1(x) # 64x512x512
-        # x_e2 = self.e2(self.max_pool(x))  # 128x256x256
-        x_e3 = self.e3(self.max_pool(x))  # 256x128x128
-        x_e4 = self.e4(self.max_pool(x_e3))  # 512x64x64
+        x_e1 = self.e1(x) # 64x512x512
+        x_e2 = self.e2(self.max_pool(x_e1))  # 128x256x256
+        # x_e3 = self.e3(self.max_pool(x_e2))  # 256x128x128
+        # x_e4 = self.e4(self.max_pool(x_e3))  # 512x64x64
 
-        x_trans = self.trans(self.max_pool(x_e4)) # 1024x32x32
+        x_trans = self.trans(self.max_pool(x_e2)) # 1024x32x32
 
         # ДЕКОДЕР
-        x_d1 = self.d1(x_trans, x_e4)
-        x_d2 = self.d2(x_d1, x_e3)
-        # x_d3 = self.d3(x_d2, x_e2)
-        # x_d4 = self.d4(x_d3, x_e1)
+        # x_d1 = self.d1(x_trans, x_e4)
+        # x_d2 = self.d2(x_d1, x_e3)
+        x_d3 = self.d3(x_trans, x_e2)
+        x_d4 = self.d4(x_d3, x_e1)
 
-        ans = self.classifier(x_d2)
+        ans = self.classifier(x_d4)
+        ans = ans.view(ans.size(0), -1)
         # print(ans.shape)
-        ans = torch.argmax(ans, dim=1).type(torch.float32).requires_grad_(True)
+        # ans = torch.argmax(ans, dim=1).type(torch.float32)
+        # ans.requires_grad = True
+        # print(ans.shape)
         # print(ans)
 
         return ans
@@ -90,7 +91,7 @@ class Model(nn.Module):
 
 
 transform = transforms.Compose([
-    transforms.Resize((64, 64)),
+    transforms.Resize((256, 256)),
     transforms.ToTensor(),
     ToDtype(torch.float32, scale=True),
     Normalize((0.5, 0.5, 0.5), (0.25, 0.25, 0.25))

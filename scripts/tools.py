@@ -18,8 +18,8 @@ def show_metrics(train_loss_hist, test_loss_hist, test_metrics):
 
     show_metric(train_loss_hist, 'Train Loss', 1)
     show_metric(test_loss_hist, 'Test Loss', 2)
-    show_metric(list(map(lambda x: x[0],test_metrics)), 'Test Accuracy', 3)
-    show_metric(list(map(lambda x: x[3],test_metrics)), 'Test F1 score', 4)
+    show_metric(list(map(lambda x: x[0], test_metrics)), 'Test Accuracy', 3)
+    show_metric(list(map(lambda x: x[3], test_metrics)), 'Test F1 score', 4)
 
     plt.tight_layout()
     plt.show()
@@ -51,3 +51,12 @@ def get_result(model: torch.nn.Module, transform: transforms.Compose):
         writer.writerow(['id', 'target_feature'])
         writer.writerows(ans)
 
+
+def save_hist(test_metrics, train_loss, test_loss, path):
+    with open(path, 'w') as file:
+        file.writelines([" ".join(list(map(str, train_loss))), '\n',
+                         " ".join(list(map(str, test_loss))), '\n',
+                         " ".join(list(map(str, map(lambda x: x[0], test_metrics)))), '\n',
+                         " ".join(list(map(str, map(lambda x: x[1], test_metrics)))), '\n',
+                         " ".join(list(map(str, map(lambda x: x[2], test_metrics)))), '\n',
+                         " ".join(list(map(str, map(lambda x: x[3], test_metrics))))])
