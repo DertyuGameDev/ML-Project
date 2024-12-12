@@ -41,23 +41,23 @@ class Model(nn.Module):
         super(Model, self).__init__()
 
         # Энкодер
-        self.e1 = Conv(3, 64)
-        self.e2 = Conv(64, 128)
+        self.e1 = Conv(3, 32)
+        self.e2 = Conv(32, 64)
         # self.e3 = Conv(128, 256)
         # self.e4 = Conv(16, 32)
-        self.trans = Conv(128, 256)
+        self.trans = Conv(64, 128)
         self.max_pool = MaxPool2d((2, 2), stride=2)
 
 
         # Декодер
         # self.d1 = DConv(1024, 512)
         # self.d2 = DConv(512, 256)
-        self.d3 = DConv(256, 128)
-        self.d4 = DConv(128, 64)
+        self.d3 = DConv(128, 64)
+        self.d4 = DConv(64, 32)
 
         # Классификатор
         self.classifier = nn.Sequential(
-            nn.Conv2d(64, 20, kernel_size=1),
+            nn.Conv2d(32, 20, kernel_size=1),
             nn.AdaptiveAvgPool2d(1)
         )
 

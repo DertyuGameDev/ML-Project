@@ -1,22 +1,25 @@
+import os.path
 import time
 
 import torch
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-from torch import nn, optim
+from torch import nn
 from tqdm import tqdm
 
 from scripts import constants
 from scripts.checkpoint import save_checkpoint
-from scripts.tools import save_hist
 
 
-def train_and_evaluate(model, train_loader, val_loader, num_epochs=30, lr=1E-1):
+def train_and_evaluate(model, train_loader, val_loader, optimizer, model_path, metrics=None, start_epochs=0, num_epochs=30):
     loss_func = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=lr)
     train_losses, val_losses = [], []
     val_metrics = []
+    if metrics is not None:
+        train_losses = metrics[0]
+        val_losses = metrics[1]
+        val_metrics = metrics[2]
 
-    for epoch in range(num_epochs):
+    for epoch in range(start_epochs, num_epochs):
         # Обучение
         train_loss = run_epoch(loss_func, model, optimizer, train_loader)
         train_losses.append(train_loss)
@@ -35,10 +38,8 @@ def train_and_evaluate(model, train_loader, val_loader, num_epochs=30, lr=1E-1):
         print(f"Epoch {epoch + 1}/{num_epochs}, Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}, "
               f"Val Acc: {accuracy:.4f}, Val Prec: {precision:.4f}, Val Recall: {recall:.4f}, Val F1: {f1:.4f}")
         if epoch % 5 == 4:
-            save_checkpoint(model, optimizer, epoch, val_loss, "C:\\Users\\kosty\\gadflhahjadgjtma\\ML-Project\\Models\\UnetModel_1\\checkpoints\\" + "model_" + str(epoch + 1) + "_" + str(accuracy))
+            save_checkpoint(model, optimizer, epoch, val_loss, [train_losses, val_losses, val_metrics], os.path.join(model_path, "checkpoints", "model_" + str(epoch + 1) + "_" + str(accuracy)))
         time.sleep(1)
-
-        save_hist(val_metrics, train_losses, val_losses, constants.hist_path)
     return train_losses, val_losses, val_metrics
 
 

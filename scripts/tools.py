@@ -50,13 +50,3 @@ def get_result(model: torch.nn.Module, transform: transforms.Compose):
         writer = csv.writer(out_file, delimiter=',')
         writer.writerow(['id', 'target_feature'])
         writer.writerows(ans)
-
-
-def save_hist(test_metrics, train_loss, test_loss, path):
-    with open(path, 'w') as file:
-        file.writelines([" ".join(list(map(str, train_loss))), '\n',
-                         " ".join(list(map(str, test_loss))), '\n',
-                         " ".join(list(map(str, map(lambda x: x[0], test_metrics)))), '\n',
-                         " ".join(list(map(str, map(lambda x: x[1], test_metrics)))), '\n',
-                         " ".join(list(map(str, map(lambda x: x[2], test_metrics)))), '\n',
-                         " ".join(list(map(str, map(lambda x: x[3], test_metrics))))])
