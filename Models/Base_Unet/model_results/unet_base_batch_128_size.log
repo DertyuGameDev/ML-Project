@@ -1,0 +1,86 @@
+Training Results Log
+==================================================
+Total Epochs: 10
+
+Epoch-wise Results:
+Epoch 1:
+  Train Loss: 0.0013
+  Val Loss: 6.3375
+  Val Accuracy: 0.4844
+  Val Precision: 0.4797
+  Val Recall: 0.4844
+  Val F1-Score: 0.4749
+
+Epoch 2:
+  Train Loss: 0.0043
+  Val Loss: 7.4087
+  Val Accuracy: 0.4622
+  Val Precision: 0.4738
+  Val Recall: 0.4622
+  Val F1-Score: 0.4463
+
+Epoch 3:
+  Train Loss: 0.0118
+  Val Loss: 7.1495
+  Val Accuracy: 0.4679
+  Val Precision: 0.4797
+  Val Recall: 0.4679
+  Val F1-Score: 0.4612
+
+Epoch 4:
+  Train Loss: 0.0117
+  Val Loss: 7.3355
+  Val Accuracy: 0.4658
+  Val Precision: 0.4750
+  Val Recall: 0.4658
+  Val F1-Score: 0.4601
+
+Epoch 5:
+  Train Loss: 0.0025
+  Val Loss: 7.8663
+  Val Accuracy: 0.4581
+  Val Precision: 0.4649
+  Val Recall: 0.4581
+  Val F1-Score: 0.4509
+
+Epoch 6:
+  Train Loss: 0.0012
+  Val Loss: 7.5632
+  Val Accuracy: 0.4594
+  Val Precision: 0.4655
+  Val Recall: 0.4594
+  Val F1-Score: 0.4567
+
+Epoch 7:
+  Train Loss: 0.0021
+  Val Loss: 7.1935
+  Val Accuracy: 0.4610
+  Val Precision: 0.4593
+  Val Recall: 0.4610
+  Val F1-Score: 0.4557
+
+Epoch 8:
+  Train Loss: 0.0016
+  Val Loss: 6.9093
+  Val Accuracy: 0.4561
+  Val Precision: 0.4544
+  Val Recall: 0.4561
+  Val F1-Score: 0.4513
+
+Epoch 9:
+  Train Loss: 0.0006
+  Val Loss: 6.8000
+  Val Accuracy: 0.4602
+  Val Precision: 0.4556
+  Val Recall: 0.4602
+  Val F1-Score: 0.4541
+
+Epoch 10:
+  Train Loss: 0.0009
+  Val Loss: 6.7149
+  Val Accuracy: 0.4586
+  Val Precision: 0.4553
+  Val Recall: 0.4586
+  Val F1-Score: 0.4528
+
+==================================================
