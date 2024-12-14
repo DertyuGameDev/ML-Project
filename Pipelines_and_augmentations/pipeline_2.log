@@ -1,0 +1,30 @@
+model: vgg
+
+pipeline:
+train_transform_2 = transforms.Compose([
+    transforms.Resize(size=size),
+    transforms.RandomApply([transforms.RandomPerspective(distortion_scale=0.5, p=0.5)]),  # Перспективные искажения
+    transforms.ColorJitter(brightness=0.6, saturation=0.4),  # Более мягкие цветовые изменения
+    transforms.RandomApply([transforms.RandomAffine(degrees=10, shear=5)]),  # Легкий сдвиг
+    transforms.RandomHorizontalFlip(p=0.5),
+    transforms.ToTensor(),
+    ToDtype(torch.float32, scale=True),
+    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+])
+
+
+-----------------------
+
+!!! optimal epoch: 75
+
+Val Accuracy: 0.5467
+
+Val F1_score: 0.5386
+
+Max Train loss: 1.0805
+
+Max Val loss: 1.4726
+
+Kaggle result F1 score: 0.52825
+
+-----------------------

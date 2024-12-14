@@ -1,0 +1,28 @@
+model: vgg
+
+train_transform_1 = transforms.Compose([
+    transforms.Resize(size=size), 
+    transforms.RandomRotation(degrees=3),  # Немного больше вращения
+    transforms.ColorJitter(brightness=0.5, saturation=0.3),  # Контроль цвета и контраста
+    transforms.RandomHorizontalFlip(p=0.5),  # Случайный горизонтальный флип
+    transforms.RandomAdjustSharpness(sharpness_factor=0.8),  # Усиление резкости
+    transforms.ToTensor(),
+    ToDtype(torch.float32, scale=True),
+    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+])
+
+-----------------------
+
+!!! optimal epoch: 75
+
+Val Accuracy: 0.6547
+
+Val F1_score: 0.6511
+
+Max Train loss: 0.4081
+
+Max Val loss: 1.2240
+
+Kaggle result F1 score: 0.53254
+
+-----------------------

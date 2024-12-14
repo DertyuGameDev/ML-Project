@@ -1,0 +1,45 @@
+model: vgg
+
+pipeline:
+train_transform = transforms.Compose([
+    transforms.Resize(size=size), 
+    transforms.RandomRotation(5),
+    transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
+    transforms.RandomApply([transforms.RandomAffine(degrees=2, translate=(0.1, 0.1))]),
+    transforms.RandomApply([transforms.GaussianBlur(kernel_size=1, sigma=(0.1, 2)), transforms.RandomGrayscale()]),
+    transforms.RandomHorizontalFlip(),
+    transforms.RandomChoice([transforms.RandomAdjustSharpness(1), transforms.RandAugment()]),
+    transforms.ToTensor(),
+    ToDtype(torch.float32, scale=True),
+    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+])
+
+-----------------------
+
+!!! optimal epoch: 75
+
+Val Accuracy: 0.5467
+
+Val F1_score: 0.5361
+
+Max Train loss: 1.0970
+
+Max Val loss: 1.5210
+
+Kaggle result F1 score: 0.55184
+
+-----------------------
+
+!!! max epoch: 100
+
+Val Accuracy: 0.7262
+
+Val F1_score: 0.7215
+
+Max Train loss: 1.2260
+
+Max Val loss: 0.9258
+
+Kaggle result F1 score: 0.54804
+
+-----------------------
